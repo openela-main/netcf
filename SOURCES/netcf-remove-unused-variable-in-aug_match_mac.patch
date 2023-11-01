@@ -1,0 +1,41 @@
+From 5a8c5768779a220d29eaeb31ca433cd8913ed876 Mon Sep 17 00:00:00 2001
+From: Laine Stump <laine@laine.org>
+Date: Mon, 17 Sep 2018 10:01:22 -0400
+Subject: [PATCH 2/7] remove unused variable in aug_match_mac()
+
+Apparently this wasn't caught by the compiler because it was
+initialized, and that counted as a "use".
+
+Signed-off-by: Laine Stump <laine@laine.org>
+(cherry picked from commit e81812e770d4e837015d92cd7d570c3df81bda9f)
+
+Resolves: https://bugzilla.redhat.com/1602628
+Signed-off-by: Laine Stump <laine@laine.org>
+---
+ src/dutil_linux.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/dutil_linux.c b/src/dutil_linux.c
+index 3a75f16..ab1dd6c 100644
+--- a/src/dutil_linux.c
++++ b/src/dutil_linux.c
+@@ -400,7 +400,7 @@ void free_matches(int nint, char ***intf) {
+ /* Returns a list of all interfaces with MAC address MAC */
+ int aug_match_mac(struct netcf *ncf, const char *mac, char ***matches) {
+     int nmatches;
+-    char *path = NULL, *mac_lower = NULL;
++    char *mac_lower = NULL;
+ 
+     mac_lower = strdup(mac);
+     ERR_NOMEM(mac_lower == NULL, ncf);
+@@ -429,7 +429,6 @@ int aug_match_mac(struct netcf *ncf, const char *mac, char ***matches) {
+ 
+  error:
+     FREE(mac_lower);
+-    FREE(path);
+     return -1;
+ }
+ 
+-- 
+2.18.1
+

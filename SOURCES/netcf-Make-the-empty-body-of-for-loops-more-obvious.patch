@@ -1,0 +1,43 @@
+From 531f40824a76754962285f1996894e9e6db2f410 Mon Sep 17 00:00:00 2001
+From: Laine Stump <laine@laine.org>
+Date: Mon, 17 Sep 2018 10:05:15 -0400
+Subject: [PATCH 3/7] Make the empty body of for loops more obvious
+
+parseline() was skipping over non-option commandline args with 3 for
+loops that had empty bodies signified by semicolons at the end of the
+for() line (twice) or with a body comprised completely of a nested
+for() that had an empty body. Coverity didn't like this. Put braces
+around all three loop bodies to make the intent more clear.
+
+Signed-off-by: Laine Stump <laine@laine.org>
+(cherry picked from commit ef9971b64d8224d1626177978227c7009812f275)
+
+Resolves: https://bugzilla.redhat.com/1602628
+Signed-off-by: Laine Stump <laine@laine.org>
+---
+ src/ncftool.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/src/ncftool.c b/src/ncftool.c
+index 7a1db5b..7baf06a 100644
+--- a/src/ncftool.c
++++ b/src/ncftool.c
+@@ -653,9 +653,12 @@ static int parseline(struct command *cmd, char *line) {
+             }
+             for (def = cmd->def->opts;
+                  def->name != NULL && !opt_def_is_arg(def);
+-                 def++);
+-            for (int i=0; i < curarg; i++)
+-                for (; def->name != NULL && !opt_def_is_arg(def); def++);
++                 def++) {
++            }
++            for (int i=0; i < curarg; i++) {
++                for (; def->name != NULL && !opt_def_is_arg(def); def++) {
++                }
++            }
+             struct command_opt *opt =
+                 make_command_opt(cmd, def);
+             opt->string = tok;
+-- 
+2.18.1
+
