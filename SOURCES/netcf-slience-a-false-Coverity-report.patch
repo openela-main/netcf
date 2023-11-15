@@ -1,0 +1,39 @@
+From 2305151c1ebae09566302fd8097ef6757a02fbcf Mon Sep 17 00:00:00 2001
+From: Laine Stump <laine@laine.org>
+Date: Tue, 18 Sep 2018 12:36:45 -0400
+Subject: [PATCH 4/7] slience a false Coverity report
+
+Coverity complains that
+
+   unref(nif, netcf_if);
+
+sets nif to NULL without free'ing the memory it points to. But unref()
+is a macro (defined in src/ref.h) that uses a refcount in the object
+to automatically free it when there are no more pointers to it.
+
+Since the code is correct, we add a comment that silences the Coverity warning
+
+Signed-off-by: Laine Stump <laine@laine.org>
+(cherry picked from commit 3c4ea18fe7e1279e5c7d033978eb45d86d759de3)
+
+Resolves: https://bugzilla.redhat.com/1602628
+Signed-off-by: Laine Stump <laine@laine.org>
+---
+ src/drv_redhat.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/drv_redhat.c b/src/drv_redhat.c
+index 092ef5c..c073af8 100644
+--- a/src/drv_redhat.c
++++ b/src/drv_redhat.c
+@@ -504,6 +504,7 @@ struct netcf_if *drv_lookup_by_name(struct netcf *ncf, const char *name) {
+     goto done;
+ 
+  error:
++    /* coverity[overwrite_var] */
+     unref(nif, netcf_if);
+     FREE(name_dup);
+  done:
+-- 
+2.18.1
+
