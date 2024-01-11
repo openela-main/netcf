@@ -1,0 +1,32 @@
+From 26866552d648bded38e9c97112f97c5ab114887c Mon Sep 17 00:00:00 2001
+From: Laine Stump <laine@laine.org>
+Date: Mon, 17 Sep 2018 10:00:50 -0400
+Subject: [PATCH 1/7] Fix memory leak in aug_match_mac()
+
+mac_lower has memory allocated to it, but it was only freed in case of
+an error.
+
+Signed-off-by: Laine Stump <laine@laine.org>
+(cherry picked from commit 478da0f8f31252be2e9e96430a8e56d9b28642ed)
+
+Resolves: https://bugzilla.redhat.com/1602628
+Signed-off-by: Laine Stump <laine@laine.org>
+---
+ src/dutil_linux.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/dutil_linux.c b/src/dutil_linux.c
+index 022eed0..3a75f16 100644
+--- a/src/dutil_linux.c
++++ b/src/dutil_linux.c
+@@ -424,6 +424,7 @@ int aug_match_mac(struct netcf *ncf, const char *mac, char ***matches) {
+         (*matches)[i] = n;
+     }
+ 
++    FREE(mac_lower);
+     return nmatches;
+ 
+  error:
+-- 
+2.18.1
+
